@@ -1,0 +1,13 @@
+{% extends 'home.html' %}
+
+{% load static %}
+
+{% block body %}
+  <div class="container">
+    <h1 class="text-center logo my-4">
+      <a href="{% url 'home' %}">Hobby Helper</a>
+    </h1>
+    {% block content %}
+    {% endblock %}
+  </div>
+{% endblock %}

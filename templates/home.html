@@ -1,0 +1,30 @@
+{% load static %} <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+{% block body %}
+
+    {% block content %}
+
+
+        <form id='file-catcher'>
+          <input id='file-input' type='file' multiple/>
+          <button type='submit'>
+            Submit
+          </button>
+        </form>
+
+        <div id='file-list-display'></div>
+
+    {% endblock %}
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+    <script src="{% static 'js/index.js' %}"></script>
+{% endblock %}
+</html>
