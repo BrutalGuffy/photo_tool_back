@@ -1,10 +1,22 @@
 from django.shortcuts import render, redirect
 from rest_framework import status
+from rest_framework.renderers import (
+                                        HTMLFormRenderer,
+                                        JSONRenderer,
+                                        BrowsableAPIRenderer,
+                                    )
+from rest_framework.views import APIView
 
-from photo.models import Photo, Tag
+from photo.models import Photo, Tag, Associate
 from rest_framework.decorators import api_view
-from .serializers import TagSerializer, PhotoSerializer
+from .serializers import TagSerializer, PhotoSerializer, PhotoUpdateSerializer
 from rest_framework.response import Response
+
+
+class CustomerApi(APIView):
+
+    serializer_class = PhotoSerializer
+    renderer_classes = (BrowsableAPIRenderer, JSONRenderer, HTMLFormRenderer)
 
 
 @api_view(['GET', 'POST'])
@@ -24,6 +36,7 @@ def tag_list(request):
 
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -58,11 +71,17 @@ def photo_list(request):
     if request.method == 'GET':
 
         photos = Photo.objects.all()
-        serializer = PhotoSerializer(photos, many=True)
+        serializer_context = {
+            'request': request,
+        }
+        serializer = PhotoSerializer(photos, many=True, context=serializer_context)
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        serializer = PhotoSerializer(data=request.data)
+        serializer_context = {
+            'request': request,
+        }
+        serializer = PhotoSerializer(data=request.data, context=serializer_context)
 
         if serializer.is_valid():
             serializer.save()
@@ -86,9 +105,24 @@ def photo_detail(request, pk):
 
 
     elif request.method == 'PUT':
-        serializer = PhotoSerializer(photo, data=request.data)
+        serializer = PhotoUpdateSerializer(photo, data=request.data)
+
+
         if serializer.is_valid():
+            tags_id = request.data['strtags'].split(',')
+            print(tags_id)
+            for tag_id in tags_id:
+                tag_id = int(tag_id)
+                try:
+                    tag = Tag.objects.get(pk=tag_id)
+                except Tag.DoesNotExist:
+                    print("not tag")
+                photo.tags.add(tag)
+                # associate = Associate.objects.create(photo)
+                # print(associate)
+
             serializer.save()
+            print(serializer.data)
             return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

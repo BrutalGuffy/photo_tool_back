@@ -5,14 +5,23 @@ from django.dispatch import receiver
 
 
 class Tag(models.Model):
-    tag = models.CharField(blank=True, null=True, max_length=240)
+    tag = models.CharField(blank=True, max_length=240)
+    value = models.CharField(blank=True, max_length=240)
 
 
 class Photo(models.Model):
     file = models.ImageField()
-    tags = models.ManyToManyField(Tag, through='Associate', related_name='tags')
+    # tags = models.ManyToManyField(Tag, through='Associate', related_name='tags')
+    tags = models.ManyToManyField(Tag, related_name='tags', blank=True)
+    name = models.CharField(blank=True, max_length=240, default='test')
     is_checked = models.BooleanField(default='False')
 
+@receiver(post_save, sender=Photo)
+def create_default_name(sender, instance, created, **kwargs):
+    if created:
+        instance.name = instance.file
+        instance.save()
+        print(instance.name)
 
 class Associate(models.Model):
     photo = models.ForeignKey(Photo, on_delete=models.CASCADE)

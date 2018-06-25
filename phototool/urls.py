@@ -17,11 +17,14 @@ from django.contrib import admin
 from django.conf.urls.static import static
 from django.urls import include
 from django.urls import path
-
+from rest_framework_swagger.views import get_swagger_view
 from photo.views import tag_list, tag_detail
 from phototool import settings
 
+schema_view = get_swagger_view(title='Pastebin API')
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('swagger', schema_view),
     path('', include('photo.urls',)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

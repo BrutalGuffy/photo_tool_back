@@ -3,11 +3,10 @@ from .models import Tag, Photo
 
 
 class TagSerializer(serializers.ModelSerializer):
-    # tag = serializers.CharField(max_length=240)
 
     class Meta:
         model = Tag
-        fields = ('tag',)
+        fields = ('tag', 'value')
 
 
 class PhotoSerializer(serializers.ModelSerializer):
@@ -16,3 +15,10 @@ class PhotoSerializer(serializers.ModelSerializer):
         model = Photo
         fields = '__all__'
 
+class PhotoUpdateSerializer(serializers.ModelSerializer):
+
+    strtags = serializers.CharField(max_length=100, write_only=True)
+
+    class Meta:
+        model = Photo
+        fields = ('is_checked', 'strtags')
